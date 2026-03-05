@@ -19,8 +19,21 @@ class ScraperWorker(QThread):
 
     # Method utama yang akan dijalankan saat thread dimulai
     def run(self):
-        pass
-
-    # Method untuk menghentikan proses scraping
-    def stop(self):
+        # DUMMY — akan diganti import dari scraper/selenium_scraper.py milik Bima setelah selesai
+        
+        def setup_driver():
+            return None
+            
+        def get_article_links(driver, url):
+            return ["http://dummy.com/1", "http://dummy.com/2", "http://dummy.com/3"]
+            
+        def scrape_article(driver, url):
+            return {
+                "title": "Dummy Title",
+                "date": "2023-01-01",
+                "content": "Dummy content for testing.",
+                "url": url
+            }
+            
+        driver = setup_driver()
         pass
