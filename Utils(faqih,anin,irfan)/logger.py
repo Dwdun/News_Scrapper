@@ -1,6 +1,8 @@
 import logging
 import logging.handlers
 import os
+import time
+import functools
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_DIR = os.path.join(BASE_DIR, "Logs(irfan)")
@@ -26,3 +28,23 @@ console_handler.setFormatter(formatter)
 
 logger.addHandler(file_handler)
 logger.addHandler(console_handler)
+
+def retry(max_attempts=3, delay=2):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < max_attempts:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    attempts += 1
+                    logger.warning(f"Attempt {attempts} failed for {func.__name__}: {e}")
+                    
+                    if attempts < max_attempts:
+                        time.sleep(delay)
+                    else:
+                        logger.error(f"Function {func.__name__} failed after {max_attempts} attempts")
+                        raise
+        return wrapper
+    return decorator
