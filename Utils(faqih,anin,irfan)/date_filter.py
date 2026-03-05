@@ -21,3 +21,27 @@ def parse_date(date_str):
     
     # Kembalikan None, jika gagal diparsing atau hasilnya None
     return None
+
+def filter_by_date(articles, start_date, end_date):
+    """
+    Fungsi untuk menyaring daftar artikel berdasarkan rentang tanggal.
+    """
+    # Jika tanggal awal atau tanggal akhir kosong, kembalikan semua artikel
+    if not start_date or not end_date:
+        return articles
+    
+    # List untuk menyimpan artikel yang sesuai
+    filtered_articles = []
+    
+    # Cek tiap artikel di daftar
+    for article in articles:
+        # Ubah teks tanggal artikel menjadi tipe date
+        article_date = parse_date(article.get('date', ''))
+        
+        # Jika tanggalnya valid dan berada di antara start_date dan end_date
+        if article_date and (start_date <= article_date <= end_date):
+            # Masukkan artikel ke hasil
+            filtered_articles.append(article)
+            
+    # Kembalikan daftar artikel yang sudah sesuai tanggal
+    return filtered_articles
