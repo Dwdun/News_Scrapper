@@ -4,9 +4,10 @@ import os
 import time
 import functools
 
+
 # Set up logging
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LOG_DIR = os.path.join(BASE_DIR, "Logs(irfan)")
+LOG_DIR = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 def get_logger(nama: str) -> logging.Logger:
@@ -18,7 +19,7 @@ def get_logger(nama: str) -> logging.Logger:
         formatter = logging.Formatter(
             "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
             )
-        log_file_path = os.path.join(LOG_DIR, "scraper.log")
+        log_file_path = os.path.join(LOG_DIR, "app.log")
 
         # RotatingFileHandler untuk mengelola ukuran file log
         file_handler = logging.handlers.RotatingFileHandler(
@@ -36,12 +37,10 @@ def get_logger(nama: str) -> logging.Logger:
         logger.addHandler(console_handler)
     return logger
 
-# Initialize module logger
-logger = get_logger(__name__)
-
 # retry decorator untuk menangani kegagalan sementara
 def retry(max_attempts=3, delay=2):
     def decorator(func):
+        log = get_logger(func.__module__)
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             attempts = 0
@@ -50,12 +49,14 @@ def retry(max_attempts=3, delay=2):
                     return func(*args, **kwargs)
                 except Exception as e:
                     attempts += 1
-                    logger.warning(f"Attempt {attempts} failed for {func.__name__}: {e}")
+                    log.warning(f"Attempt {attempts} failed for {func.__name__}: {e}")
                     
                     if attempts < max_attempts:
                         time.sleep(delay)
+
                     else:
-                        logger.error(f"Function {func.__name__} failed after {max_attempts} attempts")
+                        log.error(f"Function {func.__name__} failed after {max_attempts} attempts")
                         raise
+
         return wrapper
     return decorator
