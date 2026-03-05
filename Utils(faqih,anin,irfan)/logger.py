@@ -17,23 +17,22 @@ if not logger.handlers:
     formatter = logging.Formatter(
         "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
         )
+    log_file_path = os.path.join(LOG_DIR, "scraper.log")
 
-log_file_path = os.path.join(LOG_DIR, "scraper.log")
+    # RotatingFileHandler untuk mengelola ukuran file log
+    file_handler = logging.handlers.RotatingFileHandler(
+        log_file_path, maxBytes=5*1024*1024, backupCount=3
+        )
 
-# RotatingFileHandler untuk mengelola ukuran file log
-file_handler = logging.handlers.RotatingFileHandler(
-    log_file_path, maxBytes=5*1024*1024, backupCount=3
-    )
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
 
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(formatter)
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(formatter)
 
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-console_handler.setFormatter(formatter)
-
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+    logger.addHandler(console_handler)
 
 # retry decorator untuk menangani kegagalan sementara
 def retry(max_attempts=3, delay=2):
