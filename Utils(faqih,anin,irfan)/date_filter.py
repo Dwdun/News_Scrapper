@@ -8,8 +8,12 @@ def parse_date(date_str):
     if not date_str:
         return None
     
-    # Parsing teks tanggal, bahasa Indonesia dan Inggris
-    parsed_date = dateparser.parse(date_str, languages=["id", "en"])
+    try:
+        # Parsing teks tanggal, bahasa Indonesia dan Inggris
+        parsed_date = dateparser.parse(date_str, languages=["id", "en"])
+    except Exception:
+        # Menangkap error jika gagal
+        return None
     
     # Format tanggal (YYYY-MM-DD)
     if parsed_date:
