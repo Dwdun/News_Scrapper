@@ -4,6 +4,7 @@ import os
 import time
 import functools
 
+# Set up logging
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOG_DIR = os.path.join(BASE_DIR, "Logs(irfan)")
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -11,6 +12,7 @@ os.makedirs(LOG_DIR, exist_ok=True)
 logger = logging.getLogger("scraping_logger")
 logger.setLevel(logging.DEBUG)
 
+# memastikan tidak ada handler ganda
 if not logger.handlers:
     formatter = logging.Formatter(
         "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
@@ -18,7 +20,11 @@ if not logger.handlers:
 
 log_file_path = os.path.join(LOG_DIR, "scraper.log")
 
-file_handler = logging.FileHandler(log_file_path)
+# RotatingFileHandler untuk mengelola ukuran file log
+file_handler = logging.handlers.RotatingFileHandler(
+    log_file_path, maxBytes=5*1024*1024, backupCount=3
+    )
+
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(formatter)
 
@@ -29,6 +35,7 @@ console_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 
+# retry decorator untuk menangani kegagalan sementara
 def retry(max_attempts=3, delay=2):
     def decorator(func):
         @functools.wraps(func)
