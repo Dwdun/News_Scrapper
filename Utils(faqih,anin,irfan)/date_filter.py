@@ -30,6 +30,12 @@ def filter_by_date(articles, start_date, end_date):
     if not start_date or not end_date:
         return articles
     
+    # Ubah jika start_date atau end_date bertipe datetime menjadi date
+    if hasattr(start_date, 'date'):
+        start_date = start_date.date()
+    if hasattr(end_date, 'date'):
+        end_date = end_date.date()
+    
     # List untuk menyimpan artikel yang sesuai
     filtered_articles = []
     
