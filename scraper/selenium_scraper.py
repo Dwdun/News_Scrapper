@@ -3,7 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
-from article_extractor import extract_title, extract_date, extract_content
+from scraper.article_extractor import extract_title, extract_date, extract_content
 from urllib.parse import urlparse, urljoin
 import json
 import os
