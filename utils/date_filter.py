@@ -44,8 +44,12 @@ def filter_by_date(articles, start_date, end_date):
         # Ubah teks tanggal artikel menjadi tipe date
         article_date = parse_date(article.get('date', ''))
         
-        # Jika tanggalnya valid dan berada di antara start_date dan end_date
-        if article_date and (start_date <= article_date <= end_date):
+        # Jika hasil parse_date None, jangan dimasukkan ke hasil
+        if article_date is None:
+            continue
+            
+        # Hanya artikel dengan tanggal valid yang dibandingkan
+        if start_date <= article_date <= end_date:
             # Masukkan artikel ke hasil
             filtered_articles.append(article)
             
