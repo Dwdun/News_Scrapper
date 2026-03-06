@@ -1,19 +1,45 @@
 from selenium.webdriver.common.by import By
+from newspaper import Article
 
 
-def extract_title(driver):
-    """Ekstrak judul artikel dengan fallback selector."""
-    title_selectors = [
-        'h1', 'h1.title', 'h1.detail__title', 'h1.read__title',
-        'h1[itemprop="headline"]', '.article-title'
-    ]
+def extract_article(html, url):
+    """Ekstrak artikel menggunakan newspaper4k dari HTML yang sudah di-render Selenium."""
+    result = {
+        'title': None, 'date': None, 'content': None,
+        'image': None, 'authors': [], 'url': url
+    }
 
-    for sel in title_selectors:
-        els = driver.find_elements(By.CSS_SELECTOR, sel)
-        if els:
-            return els[0].text.strip()
+    try:
+        article = Article(url)
+        article.download(input_html=html)
+        article.parse()
 
-    return None
+        result['title'] = article.title or None
+        result['date'] = str(article.publish_date) if article.publish_date else None
+        result['content'] = article.text[:600] + '...' if len(article.text) > 600 else article.text if article.text else None
+        result['image'] = article.top_image or None
+        result['authors'] = article.authors if article.authors else []
+
+    except Exception as e:
+        print(f"  newspaper4k gagal: {e}")
+
+    return result
+
+
+def extract_article_with_fallback(driver, url):
+    """Ekstrak artikel: newspaper4k dulu, fallback ke CSS selector."""
+    html = driver.page_source
+    result = extract_article(html, url)
+
+    if not result['title']:
+        result['title'] = extract_title(driver)
+    if not result['date']:
+        result['date'] = extract_date(driver)
+    if not result['content']:
+        result['content'] = extract_content(driver)
+
+    return result
+
 
 
 def extract_date(driver):
