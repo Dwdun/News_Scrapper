@@ -60,3 +60,29 @@ def retry(max_attempts=3, delay=2):
 
         return wrapper
     return decorator
+
+def handle_selenium_error(e: Exception, url: str = "") -> str:
+    try:
+        from selenium.common.exceptions import (
+            NoSuchElementException,
+            TimeoutException,
+            WebDriverException
+        )
+    except ImportError: return f'Error: {e}'
+
+    log = get_logger('error_handler')
+
+    if isinstance(e, TimeoutException):
+        msg = f"Timeout while accessing {url}: {e}"
+
+    elif isinstance(e, NoSuchElementException):
+        msg = f"Element not found while accessing {url}: {e}"
+
+    elif isinstance(e, WebDriverException):
+        msg = f"WebDriver error: {getattr(e, 'msg', str(e))}"
+
+    else:
+        msg = f"Error [{type(e).__name__}]: {e}"
+    log.error(msg)
+    return msg
+    
