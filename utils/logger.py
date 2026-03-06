@@ -56,7 +56,7 @@ def retry(max_attempts=3, delay=2):
 
                     else:
                         log.error(f"Function {func.__name__} failed after {max_attempts} attempts")
-                        raise
+                        return None
 
         return wrapper
     return decorator
