@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from urllib.parse import urlparse, urljoin
 import json
 import os
 import time
@@ -39,6 +40,91 @@ def setup_driver():
 
     driver = webdriver.Chrome(options=options)
     return driver
+
+
+def get_article_links(driver, url, max_pages=3):
+    """Temukan link artikel dari halaman index menggunakan Selenium + heuristik."""
+    driver.get(url)
+    time.sleep(3)
+
+    parsed = urlparse(url)
+    domain_parts = parsed.netloc.lower().replace('www.', '').split('.')
+    if len(domain_parts) >= 2:
+        root_domain = '.'.join(domain_parts[-2:])
+    else:
+        root_domain = parsed.netloc.lower()
+
+    article_keywords = [
+        '/read/', '/artikel/', '/berita/', '/news/',
+        '/detail/', '/post/', '/story/', '/article/',
+        '/opini/', '/nasional/', '/internasional/',
+    ]
+
+    exclude_keywords = [
+        '/tag/', '/kategori/', '/category/', '/author/',
+        '/page/', '/search/', '/login/', '/register/',
+        '/about/', '/contact/', '/privacy/', '/terms/',
+        '#', 'javascript:', 'mailto:',
+    ]
+
+    article_links = set()
+    pages_scraped = 0
+    total_links_on_page = 0
+
+    while pages_scraped < max_pages:
+        elements = driver.find_elements(By.TAG_NAME, 'a')
+        total_links_on_page = len(elements)
+
+        for el in elements:
+            href = el.get_attribute('href')
+            if not href:
+                continue
+
+            href_domain = urlparse(href).netloc.lower().replace('www.', '')
+            if root_domain not in href_domain:
+                continue
+
+            if any(ex in href.lower() for ex in exclude_keywords):
+                continue
+
+            path = urlparse(href).path
+            has_keyword = any(kw in href.lower() for kw in article_keywords)
+            looks_like_article = len(path.split('/')) >= 3 and len(path) > 20
+
+            if has_keyword or looks_like_article:
+                article_links.add(href)
+
+        pages_scraped += 1
+        next_btn = None
+        try:
+            next_btn = driver.find_element(
+                By.CSS_SELECTOR,
+                'a.next, a[rel="next"], .pagination a.next, a.paging__link--next'
+            )
+        except Exception:
+            pass
+
+        if not next_btn:
+            try:
+                for el in driver.find_elements(By.TAG_NAME, 'a'):
+                    text = el.text.strip()
+                    if text in ('›', '»', 'Next', 'Selanjutnya'):
+                        next_btn = el
+                        break
+            except Exception:
+                pass
+
+        if next_btn and pages_scraped < max_pages:
+            try:
+                next_btn.click()
+                time.sleep(2)
+            except Exception:
+                break
+        else:
+            break
+
+    print(f"Ditemukan {len(article_links)} link artikel (dari {total_links_on_page} link di halaman, domain: {root_domain}).")
+    return list(article_links)
 
 
 if __name__ == '__main__':
