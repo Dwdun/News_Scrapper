@@ -5,7 +5,6 @@ import json
 import os
 import time
 def setup_driver():
-    """Konfigurasi dan return WebDriver untuk Brave Browser."""
     options = Options()
     options.binary_location = '/usr/bin/brave-browser'
     options.add_argument('--headless')
