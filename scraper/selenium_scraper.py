@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
+from scraper.article_extractor import extract_title, extract_date, extract_content
 from urllib.parse import urlparse, urljoin
 import json
 import os
@@ -129,7 +130,59 @@ def get_article_links(driver, url, max_pages=3):
     return list(article_links)
 
 
-if __name__ == '__main__':
+
+def scrape_article(driver, url):
+    try:
+        driver.get(url)
+        time.sleep(1)
+        title = extract_title(driver)
+        if not title:
+            return None
+        return {
+            'title': title,
+            'date': extract_date(driver),
+            'content': extract_content(driver),
+            'url': url
+        }
+    except Exception as e:
+        print(f"  Gagal membuka {url}: {e}")
+        return None
+    
+def main():
+    url = input("Masukkan URL halaman berita: ").strip()
+    if not url:
+        print("URL tidak boleh kosong.")
+        return
+    print("\nMemulai browser...")
     driver = setup_driver()
-    print("Browser berhasil dijalankan!")
-    driver.quit()
+    try:
+        print(f"Mencari link artikel dari {url}...")
+        article_links = get_article_links(driver, url)
+        if not article_links:
+            print("Tidak ditemukan link artikel.")
+            return
+        data_json = {"list": []}
+        berhasil = 0
+        print(f"\nMemproses {len(article_links)} artikel...\n")
+        for i, link in enumerate(article_links, 1):
+            print(f"[{i}/{len(article_links)}] {link}")
+            hasil = scrape_article(driver, link)
+            if hasil:
+                data_json["list"].append(hasil)
+                berhasil += 1
+                print(f"  ✓ {hasil['title'][:60]}")
+            else:
+                print(f"  ✗ Gagal mengekstrak data")
+        with open("data.json", "w") as file:
+            json.dump(data_json, file, indent=4, ensure_ascii=False)
+        print(f"\n=== Selesai ===")
+        print(f"Berhasil: {berhasil}/{len(article_links)} artikel")
+        print(f"Data disimpan ke data.json")
+    except Exception as e:
+        print(f"\nTerjadi kesalahan: {e}")
+    finally:
+        driver.quit()
+        print("Browser ditutup.")
+        
+if __name__ == '__main__':
+    main()
