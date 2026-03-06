@@ -61,7 +61,13 @@ def get_article_links(driver, url, max_pages=3):
         '/read/', '/artikel/', '/berita/', '/news/',
         '/detail/', '/post/', '/story/', '/article/',
         '/opini/', '/nasional/', '/internasional/',
+        '/hukum/', '/politik/', '/ekonomi/', '/olahraga/',
+        '/sains/', '/digital/', '/gaya-hidup/', '/hiburan/',
+        '/foto/', '/video/', '/cekfakta/', '/kolom/',
+        '/tren/', '/global/', '/otomotif/', '/food/',
+        '/hype/', '/badminton/', '/sepakbola/',
     ]
+
 
     exclude_keywords = [
         '/tag/', '/kategori/', '/category/', '/author/',
