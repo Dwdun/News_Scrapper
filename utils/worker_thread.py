@@ -36,4 +36,12 @@ class ScraperWorker(QThread):
             }
             
         driver = setup_driver()
-        pass
+        links = get_article_links(driver, self.url) # Panggil fungsi get_article_links
+        if self.limit > 0: # Cek jika ada batas limit
+            links = links[:self.limit] # Potong list sesuai limit
+        total = len(links) # Simpan panjang list
+
+        for i, link in enumerate(links): # Loop setiap link artikel
+            article = scrape_article(driver, link) # Scraping artikel
+            if article is not None: # Jika artikel berhasil di-scrape
+                self.article_ready.emit(article) # Emit signal article_ready
