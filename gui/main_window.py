@@ -92,7 +92,7 @@ class MainWindow(QMainWindow):
         root = QWidget()
         self.setCentralWidget(root)
         lay = QVBoxLayout(root)
-        lay.setSpacing(10)
+        lay.setSpacing(6)
         lay.setContentsMargins(20, 20, 20, 20)
         
         # === Bar Input URL ===
@@ -145,7 +145,7 @@ class MainWindow(QMainWindow):
                 font-weight: bold;
                 font-size: 20px;
             }
-            QPushButton:hover { border-color: #dc2626; }
+            QPushButton:hover { background-color: #dc2626; color: #fff; }
             QPushButton:disabled { color: #333333; border-color: #1e1e1e; }
         """)
 
@@ -157,8 +157,80 @@ class MainWindow(QMainWindow):
         r1.addWidget(self.url_in)
         r1.addWidget(self.btn_start)
         r1.addWidget(self.btn_stop)
-        r1.addStretch()                          
+        r1.addStretch()                        
         lay.addLayout(r1)
+        
+        # === Filter dan Limit ===
+        r2 = QHBoxLayout()
+        r2.setSpacing(10)
+
+        self.chk_date = QCheckBox('Filter Tanggal')
+        self.chk_date.setStyleSheet("""
+            QCheckBox {
+                color: #888888;
+                font-size: 13px;
+            }
+            QCheckBox:checked { color: #e8e8e8; }
+            QCheckBox::indicator {
+                width: 16px;
+                height: 16px;
+                border: 1px solid #2a2a2a;
+                border-radius: 4px;
+                background-color: #1a1a1a;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #e8e8e8;
+            }
+        """)
+
+        self.dt_start = QDateEdit(QDate.currentDate())
+        self.dt_start.setCalendarPopup(True)
+        self.dt_start.setFixedHeight(44)
+        self.dt_start.setEnabled(False)  # nonaktif dulu sebelum checkbox dicentang
+
+        self.dt_end = QDateEdit(QDate.currentDate())
+        self.dt_end.setCalendarPopup(True)
+        self.dt_end.setFixedHeight(44)
+        self.dt_end.setEnabled(False)  # nonaktif dulu sebelum checkbox dicentang
+
+        self.spin_lim = QSpinBox()
+        self.spin_lim.setMinimum(0)
+        self.spin_lim.setMaximum(9999)
+        self.spin_lim.setValue(0)
+        self.spin_lim.setPrefix('Limit : ')
+        self.spin_lim.setSuffix('  (0 = semua)')
+        self.spin_lim.setFixedHeight(44)
+        self.spin_lim.setStyleSheet("""
+            QSpinBox {
+                background-color: #1a1a1a;
+                border: 1px solid #2a2a2a;
+                border-radius: 6px;
+                padding: 6px 10px;
+                color: #e8e8e8;
+                font-size: 13px;
+            }
+        """)
+
+        lbl_dari = QLabel('Dari :')
+        lbl_dari.setStyleSheet("color: #888888; font-size: 14px;")
+        lbl_sd = QLabel('s/d :')
+        lbl_sd.setStyleSheet("color: #888888; font-size: 14px;")
+
+        r2.addStretch()
+        r2.addWidget(self.chk_date)
+        r2.addSpacing(10)
+        r2.addWidget(lbl_dari)
+        r2.addWidget(self.dt_start)
+        r2.addWidget(lbl_sd)
+        r2.addWidget(self.dt_end)
+        r2.addSpacing(20)
+        r2.addWidget(self.spin_lim)
+        r2.addStretch()
+        lay.addLayout(r2)
+
+        # Checkbox mengaktifkan/nonaktifkan DateEdit
+        self.chk_date.toggled.connect(self.dt_start.setEnabled)
+        self.chk_date.toggled.connect(self.dt_end.setEnabled)
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
