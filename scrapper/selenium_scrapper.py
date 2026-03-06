@@ -1,6 +1,8 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from urllib.parse import urlparse, urljoin
 import json
 import os
@@ -38,12 +40,12 @@ def setup_driver():
     else:
         print("Tidak ada browser khusus terdeteksi, menggunakan default ChromeDriver.")
 
-    driver = webdriver.Chrome(options=options)
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
     return driver
 
 
 def get_article_links(driver, url, max_pages=3):
-    """Temukan link artikel dari halaman index menggunakan Selenium + heuristik."""
     driver.get(url)
     time.sleep(3)
 
