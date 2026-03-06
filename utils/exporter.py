@@ -60,6 +60,36 @@ def export_to_excel(data, filepath):
             cell.font = header_font
             cell.fill = header_fill
             cell.alignment = header_alignment
+            
+        # Menulis setiap artikel ke baris berikutnya di Excel
+        for i, row in enumerate(data, 1):
+            # i = nomor urut mulai dari 1
+            # row.get(k, "") mengambil nilai dari field k, jika kosong maka ""
+            ws.append([i] + [row.get(k, "") for k in FIELDS])
+            
+        # Mengatur lebar kolom otomatis agar teks tidak terpotong
+        for col in ws.columns:
+            max_length = int(0)
+            # Mengambil huruf kolom (A, B, C, dst.)
+            column_letter = col[0].column_letter
+            
+            # Mencari teks paling panjang di dalam satu baris kolom
+            for cell in col:
+                try:
+                    if str(cell.value):
+                        if len(str(cell.value)) > max_length:
+                            max_length = len(str(cell.value))
+                except:
+                    pass
+            
+            # Menetapkan lebar kolom ditambah sedikit ruang ekstra (contoh: +2)
+            ws.column_dimensions[column_letter].width = int(max_length + 2)
+
+        # Menyimpan file Excel ke lokasi yang ditentukan
+        wb.save(filepath)
         
+        # File Excel berhasil diekspor
+        return True
+            
     except Exception:
         return False
