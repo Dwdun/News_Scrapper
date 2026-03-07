@@ -381,6 +381,63 @@ class MainWindow(QMainWindow):
         r4.addWidget(self.btn_excel)
         lay.addLayout(r4)
         
+        # === PANEL LOG ===
+        # Header log
+        r5 = QHBoxLayout()
+
+        lbl_log = QLabel('LOG')
+        lbl_log.setStyleSheet("""
+            color: #333333;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            letter-spacing: 1px;
+        """)
+
+        self.btn_clear_log = QPushButton('Hapus Log')
+        self.btn_clear_log.setFixedHeight(24)
+        self.btn_clear_log.setStyleSheet("""
+            QPushButton {
+                background-color: transparent;
+                color: #2a2a2a;
+                border: 1px solid #1e1e1e;
+                border-radius: 4px;
+                padding: 0px 10px;
+                font-family: 'Inter', 'Segoe UI', sans-serif;
+                font-size: 10px;
+            }
+            QPushButton:hover {
+                color: #555555;
+                border-color: #333333;
+            }
+        """)
+
+        r5.addWidget(lbl_log)
+        r5.addStretch()
+        r5.addWidget(self.btn_clear_log)
+        lay.addLayout(r5)
+
+        # Log box
+        self.log_box = QTextEdit()
+        self.log_box.setReadOnly(True)
+        self.log_box.setFixedHeight(120)
+        self.log_box.setStyleSheet("""
+            QTextEdit {
+                background-color: #0a0a0a;
+                border: 1px solid #1a1a1a;
+                border-radius: 8px;
+                color: #4ade80;
+                font-family: 'Consolas', 'Courier New', monospace;
+                font-size: 11px;
+                padding: 8px;
+            }
+        """)
+
+        lay.addWidget(self.log_box)
+
+        # Connect tombol hapus log
+        self.btn_clear_log.clicked.connect(self.log_box.clear)
+        
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = MainWindow()
