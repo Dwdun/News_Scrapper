@@ -1,8 +1,54 @@
 from selenium.webdriver.common.by import By
+from newspaper import Article
 
+
+def extract_article(html, url):
+    result = {
+        'title': None,
+        'date': None,
+        'content': None,
+        'image': None,
+        'authors': [],
+        'url': url
+    }
+
+    try:
+        article = Article(url)
+        article.download(input_html=html)
+        article.parse()
+
+        result['title'] = article.title or None
+        result['date'] = str(article.publish_date) if article.publish_date else None
+        result['content'] = article.text[:600] + '...' if len(article.text) > 600 else article.text if article.text else None
+        result['image'] = article.top_image or None
+        result['authors'] = article.authors if article.authors else []
+
+    except Exception as e:
+        print(f"  newspaper4k gagal: {e}")
+
+    return result
+
+
+def extract_article_with_fallback(driver, url):
+    html = driver.page_source
+    result = extract_article(html, url)
+
+    # Fallback ke CSS selector jika newspaper4k gagal ambil field tertentu
+    if not result['title']:
+        result['title'] = extract_title(driver)
+
+    if not result['date']:
+        result['date'] = extract_date(driver)
+
+    if not result['content']:
+        result['content'] = extract_content(driver)
+
+    return result
+
+
+# === Fallback Functions (CSS Selector) ===
 
 def extract_title(driver):
-    """Ekstrak judul artikel dengan fallback selector."""
     title_selectors = [
         'h1', 'h1.title', 'h1.detail__title', 'h1.read__title',
         'h1[itemprop="headline"]', '.article-title'
@@ -19,6 +65,7 @@ def extract_title(driver):
 def extract_date(driver):
     """Ekstrak tanggal artikel, prioritaskan elemen dengan attribute datetime."""
 
+    # Fase 1: Elemen dengan attribute datetime (format ISO lebih konsisten)
     datetime_selectors = [
         'time[datetime]',
         '[itemprop="datePublished"][datetime]',
@@ -37,6 +84,7 @@ def extract_date(driver):
             if value and value.strip():
                 return value.strip()
 
+    # Fase 2: Fallback ke text content dari elemen tanggal umum
     text_selectors = [
         'time',
         '.date', '.publish-date', '.detail__date',
@@ -55,8 +103,8 @@ def extract_date(driver):
     return None
 
 
-
 def extract_content(driver, min_length=30, max_chars=600):
+    """Ekstrak konten artikel, filter paragraf pendek, batasi hasil maksimal."""
 
     content_selectors = [
         'article p',
@@ -85,4 +133,3 @@ def extract_content(driver, min_length=30, max_chars=600):
                 return gabungan
 
     return None
-
