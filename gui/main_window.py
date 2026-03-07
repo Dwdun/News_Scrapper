@@ -1,4 +1,6 @@
 import sys
+import os
+import shutil
 from PyQt5.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
@@ -215,6 +217,46 @@ class MainWindow(QMainWindow):
             }
         """)
 
+        # === SpinBox untuk jumlah karakter preview isi berita ===
+        self.spin_preview = QSpinBox()
+        self.spin_preview.setMinimum(10)
+        self.spin_preview.setMaximum(9999)
+        self.spin_preview.setValue(80)  # Default 80 karakter
+        self.spin_preview.setPrefix('Preview : ')
+        self.spin_preview.setSuffix(' char')
+        self.spin_preview.setFixedHeight(44)
+        self.spin_preview.setStyleSheet("""
+            QSpinBox {
+                background-color: #1a1a1a;
+                border: 1px solid #2a2a2a;
+                border-radius: 6px;
+                padding: 6px 10px;
+                color: #e8e8e8;
+                font-size: 13px;
+            }
+        """)
+
+        # === Checkbox untuk toggle headless mode ===
+        self.chk_headless = QCheckBox('Headless Mode')
+        self.chk_headless.setChecked(True)  # Default: headless aktif
+        self.chk_headless.setStyleSheet("""
+            QCheckBox {
+                color: #888888;
+                font-size: 13px;
+            }
+            QCheckBox:checked { color: #e8e8e8; }
+            QCheckBox::indicator {
+                width: 16px;
+                height: 16px;
+                border: 1px solid #2a2a2a;
+                border-radius: 4px;
+                background-color: #1a1a1a;
+            }
+            QCheckBox::indicator:checked {
+                background-color: #e8e8e8;
+            }
+        """)
+
         lbl_dari = QLabel('Dari :')
         lbl_dari.setStyleSheet("color: #888888; font-size: 14px;")
         lbl_sd = QLabel('s/d :')
@@ -229,6 +271,10 @@ class MainWindow(QMainWindow):
         r2.addWidget(self.dt_end)
         r2.addSpacing(20)
         r2.addWidget(self.spin_lim)
+        r2.addSpacing(10)
+        r2.addWidget(self.spin_preview)
+        r2.addSpacing(10)
+        r2.addWidget(self.chk_headless)
         r2.addStretch()
         lay.addLayout(r2)
 
@@ -479,7 +525,8 @@ class MainWindow(QMainWindow):
         sd = self.dt_start.date().toPyDate() if self.chk_date.isChecked() else None
         ed = self.dt_end.date().toPyDate() if self.chk_date.isChecked() else None
          
-        self.worker = ScraperWorker(url, self.spin_lim.value(), sd, ed)
+        headless = self.chk_headless.isChecked()  # Ambil status headless mode
+        self.worker = ScraperWorker(url, self.spin_lim.value(), sd, ed, headless=headless)
         self.worker.article_ready.connect(self.on_article)
         self.worker.progress_update.connect(self.on_progress)
         self.worker.finished.connect(self.on_done)
@@ -521,7 +568,8 @@ class MainWindow(QMainWindow):
         self.table.setItem(row, 0, QTableWidgetItem(str(row + 1)))
         self.table.setItem(row, 1, QTableWidgetItem(article.get('title', '')))
         self.table.setItem(row, 2, QTableWidgetItem(article.get('date', '')))
-        self.table.setItem(row, 3, QTableWidgetItem((article.get('content') or '')[:80] + '...'))
+        preview_len = self.spin_preview.value()  # Ambil jumlah karakter preview dari SpinBox
+        self.table.setItem(row, 3, QTableWidgetItem((article.get('content') or '')[:preview_len] + '...'))
         self.table.setItem(row, 4, QTableWidgetItem(article.get('url', '')))
         self.table.scrollToBottom()
 
@@ -551,6 +599,14 @@ class MainWindow(QMainWindow):
         self.btn_start.setEnabled(True)
         self.btn_stop.setEnabled(False)
 
+    def _get_output_dir(self):
+        """Mendapatkan path folder output/ di root project dan membuatnya jika belum ada."""
+        # Root project = 2 level di atas file gui/main_window.py
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        output_dir = os.path.join(root, 'output')
+        os.makedirs(output_dir, exist_ok=True)  # Buat folder jika belum ada
+        return output_dir
+
     def do_export_csv(self):
         if not self.articles:
             self.log_box.append('[WARN]  Tidak ada artikel untuk diekspor!')
@@ -561,6 +617,11 @@ class MainWindow(QMainWindow):
         if path:
             export_to_csv(self.articles, path)
             self.log_box.append(f'[DONE]  CSV tersimpan: {path}')
+            # Auto-save salinan ke folder output/
+            output_dir = self._get_output_dir()
+            output_path = os.path.join(output_dir, os.path.basename(path))
+            shutil.copy2(path, output_path)
+            self.log_box.append(f'[DONE]  Salinan CSV tersimpan di: {output_path}')
 
     def do_export_excel(self):
         if not self.articles:
@@ -572,6 +633,11 @@ class MainWindow(QMainWindow):
         if path:
             export_to_excel(self.articles, path)
             self.log_box.append(f'[DONE]  Excel tersimpan: {path}')
+            # Auto-save salinan ke folder output/
+            output_dir = self._get_output_dir()
+            output_path = os.path.join(output_dir, os.path.basename(path))
+            shutil.copy2(path, output_path)
+            self.log_box.append(f'[DONE]  Salinan Excel tersimpan di: {output_path}')
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)

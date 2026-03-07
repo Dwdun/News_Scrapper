@@ -12,19 +12,20 @@ class ScraperWorker(QThread):
     log_message = pyqtSignal(str)  # Signal untuk mengirim log ke GUI
 
     # Inisialisasi class dengan parameter yang dibutuhkan untuk scraping
-    def __init__(self, url, limit=0, start_date=None, end_date=None, parent=None):
+    def __init__(self, url, limit=0, start_date=None, end_date=None, headless=True, parent=None):
         super().__init__(parent)
         self.url = url
         self.limit = limit
         self.start_date = start_date
         self.end_date = end_date
+        self.headless = headless  # Menyimpan preferensi headless mode
         self._running = True
 
     # Method utama yang akan dijalankan saat thread dimulai
     def run(self):
         driver = None
         try:
-            driver = setup_driver()
+            driver = setup_driver(headless=self.headless)  # Gunakan parameter headless dari user
             self.log_message.emit('[INFO]  Browser berhasil dijalankan.')
 
             # Jika ada filter tanggal, gunakan build_date_urls untuk semua halaman indeks

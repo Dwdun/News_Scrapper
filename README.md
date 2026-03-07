@@ -67,13 +67,13 @@ news-scraper/
 ├── scraper/                     # Modul scraping (Bima)
 │   ├── __init__.py
 │   ├── selenium_scraper.py      # Fungsi utama scraping
+|   |── search_article.py        # Helper pencarian link artikel
 │   └── article_extractor.py    # Helper ekstraksi konten
 │
 ├── gui/                         # Modul GUI (Fatih)
 │   ├── __init__.py
 │   ├── main_window.py           # Jendela utama aplikasi
-│   └── dialogs.py               # Dialog konfirmasi
-│
+│   
 ├── utils/                       # Modul utilitas
 │   ├── __init__.py
 │   ├── worker_thread.py         # Threading scraping (Faqih)
@@ -83,7 +83,7 @@ news-scraper/
 │
 ├── docs/                        # Dokumentasi
 │   ├── laporan.pdf              # Laporan teknis (Irfan)
-│   └── screenshots/             # Screenshot aplikasi (Fatih)
+│   └── screenshots/             # Screenshot aplikasi 
 │
 ├── logs/                        # File log (auto-generated)
 │   └── app.log
@@ -258,13 +258,24 @@ User klik Export → simpan ke CSV/Excel
 
 | Branch | Penanggung Jawab |
 |---|---|
-| `feature/faqih-threading` | Faqih |
+| `feature/faqih-threads` | Faqih |
 | `feature/bima-scraper` | Bima |
 | `feature/fatih-gui` | Fatih |
-| `feature/anin-export-filter` | Anin |
-| `feature/irfan-logging` | Irfan |
+| `feature/anin-export` | Anin |
+| `feature/irfan-logs` | Irfan |
 
 ---
+
+## Preview Aplikasi
+
+### Tampilan Awal
+![Tampilan Awal](docs/Screenshoots/before.png)
+
+### Proses Scraping
+![Proses Scraping](docs/Screenshoots/scrap.png)
+
+### Hasil Export CSV
+![Hasil Export CSV](docs/Screenshoots/after.png)
 
 ## Lisensi
 
