@@ -5,6 +5,10 @@ from PyQt5.QtWidgets import (
     QProgressBar, QSpinBox, QDateEdit, QCheckBox, QTextEdit, QFileDialog, QApplication
 )
 from PyQt5.QtCore import QDate, Qt
+from utils.worker_thread import ScraperWorker
+from utils.date_filter import filter_by_date
+from PyQt5.QtWidgets import QFileDialog
+from utils.exporter import export_to_csv, export_to_excel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -467,15 +471,13 @@ class MainWindow(QMainWindow):
         # Ambil parameter filter
         sd = self.dt_start.date().toPyDate() if self.chk_date.isChecked() else None
         ed = self.dt_end.date().toPyDate() if self.chk_date.isChecked() else None
-
-        # Buat dan jalankan worker — import dari Faqih
-        # from utils.worker_thread import ScraperWorker  ← uncomment kalau sudah ada
-        # self.worker = ScraperWorker(url, self.spin_lim.value(), sd, ed)
-        # self.worker.article_ready.connect(self.on_article)
-        # self.worker.progress_update.connect(self.on_progress)
-        # self.worker.finished.connect(self.on_done)
-        # self.worker.error_occurred.connect(self.on_error)
-        # self.worker.start()
+         
+        self.worker = ScraperWorker(url, self.spin_lim.value(), sd, ed)
+        self.worker.article_ready.connect(self.on_article)
+        self.worker.progress_update.connect(self.on_progress)
+        self.worker.finished.connect(self.on_done)
+        self.worker.error_occurred.connect(self.on_error)
+        self.worker.start()
 
         # Toggle tombol
         self.btn_start.setEnabled(False)
@@ -491,7 +493,6 @@ class MainWindow(QMainWindow):
     def on_article(self, article: dict):
         # Filter tanggal kalau aktif
         if self.chk_date.isChecked():
-            from utils.date_filter import filter_by_date
             hasil = filter_by_date(
                 [article],
                 self.dt_start.date().toPyDate(),
@@ -543,12 +544,10 @@ class MainWindow(QMainWindow):
         if not self.articles:
             self.log_box.append('[WARN]  Tidak ada artikel untuk diekspor!')
             return
-        from PyQt5.QtWidgets import QFileDialog
         path, _ = QFileDialog.getSaveFileName(
             self, 'Simpan CSV', 'hasil_scraping.csv', 'CSV (*.csv)'
         )
         if path:
-            # from utils.exporter import export_to_csv  ← uncomment kalau Anin sudah selesai
             # export_to_csv(self.articles, path)
             self.log_box.append(f'[DONE]  CSV tersimpan: {path}')
 
@@ -556,12 +555,10 @@ class MainWindow(QMainWindow):
         if not self.articles:
             self.log_box.append('[WARN]  Tidak ada artikel untuk diekspor!')
             return
-        from PyQt5.QtWidgets import QFileDialog
         path, _ = QFileDialog.getSaveFileName(
             self, 'Simpan Excel', 'hasil_scraping.xlsx', 'Excel (*.xlsx)'
         )
         if path:
-            # from utils.exporter import export_to_excel  ← uncomment kalau Anin sudah selesai
             # export_to_excel(self.articles, path)
             self.log_box.append(f'[DONE]  Excel tersimpan: {path}')
         
