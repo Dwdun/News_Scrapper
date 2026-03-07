@@ -9,7 +9,7 @@ from PyQt5.QtCore import QDate, Qt
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('Newscrapper © A1 Pokemoon')
+        self.setWindowTitle('Mewscrapper © A1 Pokemoon')
         self.setMinimumSize(1200, 750)
         self.articles = []   # list artikel hasil scraping
         self.worker = None   # akan diisi ScraperWorker nanti
@@ -232,97 +232,97 @@ class MainWindow(QMainWindow):
         self.chk_date.toggled.connect(self.dt_start.setEnabled)
         self.chk_date.toggled.connect(self.dt_end.setEnabled)
 
-        # === Status Label + Progress Bar ===
-        # QLabel untuk menampilkan teks status scraping secara deskriptif.
-        # Diletakkan di atas progress bar agar user tahu apa yang sedang terjadi
-        # sebelum melihat angka persentase.
-        self.lbl_status = QLabel('Idle')
-        self.lbl_status.setAlignment(Qt.AlignCenter)   # teks selalu di tengah
-        self.lbl_status.setStyleSheet("""
-            QLabel {
-                color: #888888;          /* abu-abu sekunder — netral saat Idle */
-                font-size: 13px;
-                padding: 4px 0px;
-            }
+        # === PROGRESS BAR & LABEL STATUS ===
+        r3 = QVBoxLayout()
+        r3.setSpacing(4)
+
+        self.prog_lbl = QLabel('Siap — Masukkan URL dan klik Start.')
+        self.prog_lbl.setStyleSheet("""
+            color: #555555;
+            font-size: 12px;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
         """)
 
-        # QProgressBar menampilkan kemajuan scraping secara visual.
-        # setRange(0, 0) → mode "indeterminate" (animasi berputar) saat total belum diketahui.
-        # setRange(0, N) → mode normal 0–N setelah total artikel diketahui.
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setRange(0, 0)       # indeterminate dulu, berubah saat scraping mulai
-        self.progress_bar.setValue(0)
-        self.progress_bar.setFixedHeight(6)    # tipis seperti garis — mengikuti design system
-        self.progress_bar.setTextVisible(False)  # teks % disembunyikan; kita pakai lbl_status
-        # Style khusus progress bar agar tidak dioverride global stylesheet
-        self.progress_bar.setStyleSheet("""
+        self.progress = QProgressBar()
+        self.progress.setValue(0)
+        self.progress.setFixedHeight(6)
+        self.progress.setTextVisible(False)
+        self.progress.setStyleSheet("""
             QProgressBar {
-                background-color: #1a1a1a;   /* card color */
+                background-color: #1a1a1a;
                 border: none;
                 border-radius: 3px;
             }
             QProgressBar::chunk {
-                background-color: #e8e8e8;   /* putih — konsisten dengan btn_start */
+                background-color: #e8e8e8;
                 border-radius: 3px;
             }
         """)
 
-        lay.addWidget(self.lbl_status)
-        lay.addWidget(self.progress_bar)
+        r3.addWidget(self.prog_lbl)
+        r3.addWidget(self.progress)
+        lay.addLayout(r3)
         
-    # ------------------------------------------------------------------
-    # SLOT: on_progress
-    # Dipanggil oleh sinyal  ScraperWorker.progress_update(current, total)
-    # yang dikirim Faqih dari worker_thread.py setiap kali satu artikel
-    # selesai di-scrape.
-    #
-    # Parameter:
-    #   current (int) — nomor artikel yang baru selesai (1-based)
-    #   total   (int) — total artikel yang akan di-scrape
-    # ------------------------------------------------------------------
-    def on_progress(self, current: int, total: int):
-        # Pertama kali total diketahui → set range agar bar tidak lagi "indeterminate"
-        if self.progress_bar.maximum() != total:
-            self.progress_bar.setRange(0, total)
+        # === TABEL 5 KOLOM ===
+        self.table = QTableWidget(0, 5)
+        self.table.setHorizontalHeaderLabels([
+            'No', 'Judul', 'Tanggal', 'Isi (preview)', 'URL'
+        ])
 
-        self.progress_bar.setValue(current)
+        # Lebar kolom
+        self.table.setColumnWidth(0, 50)   # No
+        self.table.setColumnWidth(1, 280)  # Judul
+        self.table.setColumnWidth(2, 110)  # Tanggal
+        self.table.setColumnWidth(3, 350)  # Isi preview
+        self.table.horizontalHeader().setStretchLastSection(True)  # URL isi sisa
 
-        # Update label dengan teks berwarna putih (aktif) saat scraping berjalan
-        self.lbl_status.setText(f'Scraping artikel {current} / {total}…')
-        self.lbl_status.setStyleSheet("""
-            QLabel {
-                color: #e8e8e8;   /* teks utama — menandakan proses aktif */
+        # Tinggi baris
+        self.table.verticalHeader().setDefaultSectionSize(40)
+        self.table.verticalHeader().setVisible(False)  # sembunyikan nomor baris kiri
+
+        # Behaviour
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)  # tidak bisa diedit
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)  # pilih per baris
+        self.table.setAlternatingRowColors(True)  # warna selang-seling
+        self.table.setShowGrid(False)  # sembunyikan garis grid
+
+        self.table.setStyleSheet("""
+            QTableWidget {
+                background-color: #0f0f0f;
+                border: 1px solid #1e1e1e;
+                border-radius: 8px;
+                font-family: 'Inter', 'Segoe UI', sans-serif;
                 font-size: 13px;
-                padding: 4px 0px;
+                outline: none;
+            }
+            QTableWidget::item {
+                padding: 8px 12px;
+                color: #e8e8e8;
+                border-bottom: 1px solid #1a1a1a;
+            }
+            QTableWidget::item:selected {
+                background-color: #1e1e1e;
+                color: #ffffff;
+            }
+            QTableWidget::item:alternate {
+                background-color: #0a0a0a;
+            }
+            QHeaderView::section {
+                background-color: #0f0f0f;
+                color: #444444;
+                padding: 10px 12px;
+                border: none;
+                border-bottom: 1px solid #1e1e1e;
+                font-weight: 600;
+                font-size: 11px;
+                font-family: 'Inter', 'Segoe UI', sans-serif;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
         """)
 
-    # ------------------------------------------------------------------
-    # SLOT: on_status
-    # Slot utilitas untuk memperbarui HANYA teks label tanpa menyentuh bar.
-    # Berguna untuk pesan dari sinyal finished() atau error_occurred(str)
-    # milik Faqih.
-    #
-    # Parameter:
-    #   message (str)  — teks yang akan ditampilkan
-    #   is_error (bool) — jika True teks jadi merah, default False
-    # ------------------------------------------------------------------
-    def on_status(self, message: str, is_error: bool = False):
-        self.lbl_status.setText(message)
-        text_color = '#ff4444' if is_error else '#888888'   # merah saat error, abu saat normal
-        self.lbl_status.setStyleSheet(f"""
-            QLabel {{
-                color: {text_color};
-                font-size: 13px;
-                padding: 4px 0px;
-            }}
-        """)
-
-        # Jika bukan error dan bar sudah di titik akhir → reset ke 0 agar bersih
-        if not is_error and self.progress_bar.value() == self.progress_bar.maximum():
-            self.progress_bar.setRange(0, 0)   # kembali ke indeterminate (kosong)
-            self.progress_bar.setValue(0)
-
+        lay.addWidget(self.table, stretch=1)
+        
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = MainWindow()
