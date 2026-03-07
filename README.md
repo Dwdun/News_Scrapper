@@ -271,8 +271,8 @@ User klik Export → simpan ke CSV/Excel
 ### Scrapping:
 ![Scrapping](docs/Screenshoots/scrap.png)
 
-### Export:
-![Export](docs/Screenshoots/export.png)
+### Output:
+![Output](docs/Screenshoots/output.png)
 
 ## Lisensi
 
