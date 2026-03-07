@@ -323,6 +323,64 @@ class MainWindow(QMainWindow):
 
         lay.addWidget(self.table, stretch=1)
         
+        # === TOMBOL EXPORT ===
+        r4 = QHBoxLayout()
+        r4.setSpacing(8)
+
+        self.btn_csv = QPushButton('⬇  Export CSV')
+        self.btn_csv.setFixedHeight(40)
+        self.btn_csv.setStyleSheet("""
+            QPushButton {
+                background-color: #1a1a1a;
+                color: #888888;
+                border: 1px solid #2a2a2a;
+                border-radius: 6px;
+                padding: 8px 18px;
+                font-family: 'Inter', 'Segoe UI', sans-serif;
+                font-size: 13px;
+                font-weight: 500;
+            }
+            QPushButton:hover {
+                border-color: #e8e8e8;
+                color: #e8e8e8;
+            }
+            QPushButton:disabled { color: #2a2a2a; border-color: #1e1e1e; }
+        """)
+
+        self.btn_excel = QPushButton('⬇  Export Excel')
+        self.btn_excel.setFixedHeight(40)
+        self.btn_excel.setStyleSheet("""
+            QPushButton {
+                background-color: #1a1a1a;
+                color: #888888;
+                border: 1px solid #2a2a2a;
+                border-radius: 6px;
+                padding: 8px 18px;
+                font-family: 'Inter', 'Segoe UI', sans-serif;
+                font-size: 13px;
+                font-weight: 500;
+            }
+            QPushButton:hover {
+                border-color: #4ade80;
+                color: #4ade80;
+            }
+            QPushButton:disabled { color: #2a2a2a; border-color: #1e1e1e; }
+        """)
+
+        # Label jumlah artikel
+        self.lbl_count = QLabel('0 artikel')
+        self.lbl_count.setStyleSheet("""
+            color: #333333;
+            font-size: 12px;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+        """)
+
+        r4.addWidget(self.lbl_count)       # kiri — jumlah artikel
+        r4.addStretch()                    # dorong tombol ke kanan
+        r4.addWidget(self.btn_csv)
+        r4.addWidget(self.btn_excel)
+        lay.addLayout(r4)
+        
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = MainWindow()
