@@ -112,12 +112,13 @@ def build_date_urls(base_url, start_date, end_date):
 
     return urls
 
-def setup_driver():
+def setup_driver(headless=True):
     
     import shutil
 
     options = Options()
-    options.add_argument('--headless')
+    if headless:  # Hanya tambahkan --headless jika mode headless aktif
+        options.add_argument('--headless')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
