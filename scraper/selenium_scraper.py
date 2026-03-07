@@ -1,6 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
+
 from newspaper import Article
 from urllib.parse import urlparse, urljoin
 from datetime import datetime, timedelta
@@ -8,7 +11,7 @@ from dateutil import parser as dateparser
 import json
 import os
 import time
-from article_extractor import extract_article_with_fallback
+from scraper.article_extractor import extract_article_with_fallback
 
 
 def parse_date(date_str):
@@ -145,7 +148,8 @@ def setup_driver():
     else:
         print("Tidak ada browser khusus terdeteksi, menggunakan default ChromeDriver.")
 
-    driver = webdriver.Chrome(options=options)
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=options)
     return driver
 
 
