@@ -268,14 +268,11 @@ User klik Export → simpan ke CSV/Excel
 
 ## Preview Aplikasi
 
-### Tampilan Awal
-![Tampilan Awal](docs/Screenshoots/before.png)
+### Scrapping:
+![Scrapping](docs/Screenshoots/scrap.png)
 
-### Proses Scraping
-![Proses Scraping](docs/Screenshoots/scrap.png)
-
-### Hasil Export CSV
-![Hasil Export CSV](docs/Screenshoots/after.png)
+### Export:
+![Export](docs/Screenshoots/export.png)
 
 ## Lisensi
 

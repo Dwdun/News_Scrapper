@@ -615,13 +615,22 @@ class MainWindow(QMainWindow):
             self, 'Simpan CSV', 'hasil_scraping.csv', 'CSV (*.csv)'
         )
         if path:
-            export_to_csv(self.articles, path)
+            content_limit = self.spin_preview.value()  # Ambil limit karakter dari SpinBox
+            export_to_csv(self.articles, path, content_limit=content_limit)
             self.log_box.append(f'[DONE]  CSV tersimpan: {path}')
             # Auto-save salinan ke folder output/
             output_dir = self._get_output_dir()
             output_path = os.path.join(output_dir, os.path.basename(path))
             shutil.copy2(path, output_path)
             self.log_box.append(f'[DONE]  Salinan CSV tersimpan di: {output_path}')
+            # Juga simpan versi Excel (dengan header berwarna) di output/
+            excel_name = os.path.splitext(os.path.basename(path))[0] + '.xlsx'
+            excel_output = os.path.join(output_dir, excel_name)
+            result = export_to_excel(self.articles, excel_output, content_limit=content_limit)
+            if result is True:
+                self.log_box.append(f'[DONE]  Versi Excel tersimpan di: {excel_output}')
+            else:
+                self.log_box.append(f'[ERROR]  Gagal buat Excel: {result}')
 
     def do_export_excel(self):
         if not self.articles:
@@ -631,13 +640,17 @@ class MainWindow(QMainWindow):
             self, 'Simpan Excel', 'hasil_scraping.xlsx', 'Excel (*.xlsx)'
         )
         if path:
-            export_to_excel(self.articles, path)
-            self.log_box.append(f'[DONE]  Excel tersimpan: {path}')
-            # Auto-save salinan ke folder output/
-            output_dir = self._get_output_dir()
-            output_path = os.path.join(output_dir, os.path.basename(path))
-            shutil.copy2(path, output_path)
-            self.log_box.append(f'[DONE]  Salinan Excel tersimpan di: {output_path}')
+            content_limit = self.spin_preview.value()  # Ambil limit karakter dari SpinBox
+            result = export_to_excel(self.articles, path, content_limit=content_limit)
+            if result is True:
+                self.log_box.append(f'[DONE]  Excel tersimpan: {path}')
+                # Auto-save salinan ke folder output/
+                output_dir = self._get_output_dir()
+                output_path = os.path.join(output_dir, os.path.basename(path))
+                shutil.copy2(path, output_path)
+                self.log_box.append(f'[DONE]  Salinan Excel tersimpan di: {output_path}')
+            else:
+                self.log_box.append(f'[ERROR]  Gagal export Excel: {result}')
         
 if __name__ == '__main__':
     app = QApplication(sys.argv)
