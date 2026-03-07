@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QDate, Qt
 from utils.worker_thread import ScraperWorker
 from utils.date_filter import filter_by_date
-from PyQt5.QtWidgets import QFileDialog
 from utils.exporter import export_to_csv, export_to_excel
 
 class MainWindow(QMainWindow):
@@ -548,7 +547,7 @@ class MainWindow(QMainWindow):
             self, 'Simpan CSV', 'hasil_scraping.csv', 'CSV (*.csv)'
         )
         if path:
-            # export_to_csv(self.articles, path)
+            export_to_csv(self.articles, path)
             self.log_box.append(f'[DONE]  CSV tersimpan: {path}')
 
     def do_export_excel(self):
@@ -559,7 +558,7 @@ class MainWindow(QMainWindow):
             self, 'Simpan Excel', 'hasil_scraping.xlsx', 'Excel (*.xlsx)'
         )
         if path:
-            # export_to_excel(self.articles, path)
+            export_to_excel(self.articles, path)
             self.log_box.append(f'[DONE]  Excel tersimpan: {path}')
         
 if __name__ == '__main__':
