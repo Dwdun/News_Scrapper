@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QThread, pyqtSignal
+from scraper.selenium_scraper import setup_driver, get_article_links, scrape_article
 
 # Class ini berfungsi sebagai thread terpisah untuk menjalankan proses scraping berita
 # agar tidak membuat GUI utama (main thread) menjadi freeze/not responding.
@@ -19,22 +20,6 @@ class ScraperWorker(QThread):
 
     # Method utama yang akan dijalankan saat thread dimulai
     def run(self):
-        # DUMMY — akan diganti import dari scraper/selenium_scraper.py milik Bima setelah selesai
-        
-        def setup_driver():
-            return None
-            
-        def get_article_links(driver, url):
-            return ["http://dummy.com/1", "http://dummy.com/2", "http://dummy.com/3"]
-            
-        def scrape_article(driver, url):
-            return {
-                "title": "Dummy Title",
-                "date": "2023-01-01",
-                "content": "Dummy content for testing.",
-                "url": url
-            }
-            
         try:
             driver = setup_driver()
             links = get_article_links(driver, self.url) # Panggil fungsi get_article_links
