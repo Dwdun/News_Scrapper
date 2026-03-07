@@ -1,14 +1,16 @@
-# 📰 NewsPedia — Aplikasi Scraping Berita Otomatis
+# MewScrapper — Aplikasi Scraping Berita Otomatis
 
 > Aplikasi desktop Python untuk mengumpulkan artikel berita secara otomatis dari berbagai website berita Indonesia menggunakan Selenium dan PyQt5.
 
 ---
 
-## 👥 Tim Pengembang
+## Anggota Kelompok
+
+**Kelompok A1 D4_1A Teknik Informatika**
 
 | Nama | Peran | File |
 |---|---|---|
-| **Faqih** | Threading & Integrasi (Lead) | `main.py`, `utils/worker_thread.py` |
+| **Faqih** | Threading & Integrasi (Lead) | `main.py`, `utils/worker_thread.py`, `README.md` |
 | **Bima** | Selenium Scraper | `scraper/selenium_scraper.py`, `scraper/article_extractor.py` |
 | **Fatih** | GUI Developer (PyQt5) | `gui/main_window.py`, `gui/dialogs.py` |
 | **Anin** | Export & Filter Tanggal | `utils/exporter.py`, `utils/date_filter.py` |
@@ -16,27 +18,22 @@
 
 ---
 
-## 📋 Deskripsi Aplikasi
+## Deskripsi Aplikasi
 
-NewsHarvest adalah aplikasi desktop berbasis Python yang memungkinkan pengguna mengumpulkan artikel berita secara otomatis dari berbagai website berita. Pengguna cukup memasukkan satu URL halaman berita, kemudian sistem secara otomatis:
+Aplikasi ini merupakan sebuah sistem web scraping berita yang dirancang untuk mengumpulkan data artikel secara otomatis dari sebuah website portal berita. Pengguna hanya perlu memasukkan URL halaman berita, kemudian sistem akan menelusuri halaman tersebut untuk mengumpulkan link artikel yang tersedia. Selanjutnya, aplikasi akan mengunjungi setiap artikel untuk mengekstrak informasi penting seperti judul berita, tanggal publikasi, isi artikel, dan URL.
 
-1. Mengumpulkan semua link artikel di halaman tersebut
-2. Membuka setiap artikel satu per satu menggunakan Chrome headless
-3. Mengekstraksi judul, tanggal, dan isi berita
-4. Menampilkan hasil secara real-time di antarmuka GUI
-5. Menyimpan hasil ke format CSV atau Excel
-
-Proses scraping berjalan di background thread sehingga GUI tidak freeze selama proses berlangsung.
+Data yang berhasil diperoleh ditampilkan secara langsung pada antarmuka aplikasi dan dapat disaring berdasarkan rentang tanggal tertentu sesuai kebutuhan pengguna. Hasil scraping kemudian dapat disimpan dalam format CSV atau Microsoft Excel sehingga mudah digunakan untuk analisis data, dokumentasi, maupun penelitian.
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 - **Scraping otomatis** — input URL, klik Start, semua artikel dikumpulkan otomatis
 - **Real-time display** — artikel muncul satu per satu saat berhasil di-scrape
 - **Multi-website** — mendukung berbagai website berita Indonesia (CNN Indonesia, Detik, Kompas, Tribun, dll)
 - **Filter tanggal** — saring artikel berdasarkan rentang tanggal tertentu
 - **Limit artikel** — batasi jumlah artikel yang ingin dikumpulkan
+- **Custom karakter konten** — pilih berapa karakter isi artikel yang ditampilkan
 - **Export CSV & Excel** — simpan hasil scraping ke file
 - **Tombol Stop** — hentikan proses scraping kapan saja
 - **Panel log** — pantau aktivitas scraping secara real-time
@@ -44,26 +41,27 @@ Proses scraping berjalan di background thread sehingga GUI tidak freeze selama p
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 | Library | Versi | Fungsi |
 |---|---|---|
-| `selenium` | >=4.0.0 | Otomatisasi browser Chrome |
-| `webdriver-manager` | >=4.0.0 | Auto-download ChromeDriver |
-| `PyQt5` | >=5.15.0 | Framework GUI |
-| `openpyxl` | >=3.1.0 | Export ke Excel (.xlsx) |
-| `dateparser` | >=1.1.0 | Parse format tanggal berbagai bahasa |
-| `beautifulsoup4` | >=4.12.0 | Parsing HTML helper |
+| `selenium` | >=4.0.0 | Otomatisasi browser Chrome untuk scraping |
+| `webdriver-manager` | >=4.0.0 | Auto-download ChromeDriver sesuai versi Chrome |
+| `PyQt5` | >=5.15.0 | Framework pembuatan GUI desktop |
+| `openpyxl` | >=3.1.0 | Export data ke format Excel (.xlsx) |
+| `dateparser` | >=1.1.0 | Parse format tanggal bahasa Indonesia dan Inggris |
+| `beautifulsoup4` | >=4.12.0 | Parsing HTML sebagai helper ekstraksi konten |
+| `newspaper3k` | >=0.9.3 | Ekstraksi artikel dan metadata dari website berita |
 
 ---
 
-## 📁 Struktur Project
+## Struktur Project
 
 ```
 news-scraper/
-├── main.py                      # Entry point aplikasi
+├── main.py                      # Entry point aplikasi (Faqih)
 ├── requirements.txt             # Daftar library yang dibutuhkan
-├── README.md                    # Dokumentasi project
+├── README.md                    # Dokumentasi project (Faqih)
 ├── .gitignore                   # File yang diabaikan Git
 │
 ├── scraper/                     # Modul scraping (Bima)
@@ -95,7 +93,7 @@ news-scraper/
 
 ---
 
-## ⚙️ Instalasi
+## Instalasi
 
 ### Prasyarat
 - Python 3.8 atau lebih baru
@@ -106,7 +104,7 @@ news-scraper/
 
 **1. Clone repository**
 ```bash
-git clone https://github.com/[username]/news-scraper.git
+git clone https://github.com/Dwdun/news-scraper.git
 cd news-scraper
 ```
 
@@ -117,7 +115,7 @@ pip install -r requirements.txt
 
 Atau install manual:
 ```bash
-pip install selenium webdriver-manager PyQt5 openpyxl dateparser beautifulsoup4
+pip install selenium webdriver-manager PyQt5 openpyxl dateparser beautifulsoup4 newspaper3k
 ```
 
 **3. Jalankan aplikasi**
@@ -127,7 +125,7 @@ python main.py
 
 ---
 
-## 🚀 Panduan Penggunaan
+## Panduan Penggunaan
 
 ### Scraping Artikel
 
@@ -137,12 +135,13 @@ python main.py
    https://www.cnnindonesia.com/nasional
    ```
 3. Atur pengaturan opsional:
-   - **Limit artikel** — centang dan isi angka jika ingin membatasi jumlah artikel
+   - **Limit artikel** — isi angka jika ingin membatasi jumlah artikel (0 = semua)
    - **Filter tanggal** — centang dan pilih rentang tanggal
+   - **Max karakter konten** — pilih berapa karakter isi artikel yang ditampilkan
    - **Headless mode** — centang agar Chrome tidak muncul di layar
-4. Klik tombol **▶ Start** untuk memulai
+4. Klik tombol **Start** untuk memulai
 5. Artikel akan muncul satu per satu di tabel secara real-time
-6. Klik **■ Stop** kapan saja untuk menghentikan proses
+6. Klik **Stop** kapan saja untuk menghentikan proses
 
 ### Export Data
 
@@ -160,90 +159,79 @@ python main.py
 
 ---
 
-## 🌐 Website yang Didukung
-
-Aplikasi ini menggunakan multiple fallback CSS selector sehingga dapat bekerja di berbagai website berita. Website yang direkomendasikan:
+## Website yang Didukung
 
 | Website | URL | Status |
 |---|---|---|
-| CNN Indonesia | cnnindonesia.com | ✅ Direkomendasikan |
-| Detik | detik.com | ✅ Direkomendasikan |
-| Kompas | kompas.com | ✅ Direkomendasikan |
-| Tribun News | tribunnews.com | ✅ Direkomendasikan |
-| Tempo | tempo.co | ⚠️ Mungkin lebih lambat |
-| Republika | republika.co.id | ⚠️ Struktur kompleks |
+| CNN Indonesia | cnnindonesia.com | Direkomendasikan |
+| Detik | detik.com | Direkomendasikan |
+| Kompas | kompas.com | Direkomendasikan |
+| Tribun News | tribunnews.com | Direkomendasikan |
+| Tempo | tempo.co | Mungkin lebih lambat |
 
 > **Catatan:** Website yang memerlukan login atau menggunakan proteksi anti-bot (Cloudflare) tidak dapat di-scrape.
 
 ---
 
-## 📝 Format Data Hasil Scraping
-
-Setiap artikel yang berhasil di-scrape akan memiliki format berikut:
+## Format Data Hasil Scraping
 
 | Kolom | Tipe | Deskripsi |
 |---|---|---|
 | `No` | int | Nomor urut artikel |
 | `Judul` | str | Judul artikel berita |
 | `Tanggal` | str | Tanggal publikasi artikel |
-| `Isi` | str | Isi/konten artikel (maks. 600 karakter) |
+| `Isi` | str | Isi/konten artikel (bisa di-custom max karakternya) |
 | `URL` | str | Link langsung ke artikel |
 
 ---
 
-## 🔧 Konfigurasi
+## Konfigurasi
 
 ### Headless Mode
-Untuk melihat proses scraping di browser (berguna saat debugging):
 - Di GUI: hilangkan centang pada checkbox **Headless mode**
-- Di kode (`scraper/selenium_scraper.py`): hapus atau comment baris `options.add_argument('--headless')`
+- Di kode (`scraper/selenium_scraper.py`): hapus baris `options.add_argument('--headless')`
 
 ### Mengubah Batas Konten Artikel
-Di file `scraper/article_extractor.py`, ubah nilai `600` pada baris:
+Bisa langsung diatur dari GUI melalui input **Max Karakter Konten**.
+
+Atau di kode `scraper/article_extractor.py`:
 ```python
-return content[:600]  # ubah angka ini sesuai kebutuhan
+def extract_content(driver, max_chars=600):
+    ...
+    return content[:max_chars]  # ubah angka default sesuai kebutuhan
 ```
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Chrome tidak ditemukan
 ```
 WebDriverException: Chrome not found
 ```
-**Solusi:** Install Google Chrome dari [chrome.google.com](https://chrome.google.com)
+**Solusi:** Install Google Chrome dari [chrome.google.com](https://chrome.google.com). Aplikasi juga mendukung Brave, Chromium, dan Edge secara otomatis.
 
 ### ChromeDriver versi tidak cocok
 ```
 SessionNotCreatedException: Chrome version mismatch
 ```
-**Solusi:** Library `webdriver-manager` akan otomatis download ChromeDriver yang sesuai. Pastikan koneksi internet aktif saat pertama kali menjalankan.
+**Solusi:** `webdriver-manager` akan otomatis download ChromeDriver yang sesuai. Pastikan koneksi internet aktif saat pertama kali menjalankan.
 
 ### Artikel tidak berhasil di-scrape
 ```
 Artikel: 0 dari X berhasil
 ```
-**Solusi:**
-- Coba matikan headless mode untuk melihat apa yang terjadi di browser
-- Cek apakah website memerlukan login
-- Coba tambah delay dengan mengedit `time.sleep()` di `selenium_scraper.py`
+**Solusi:** Matikan headless mode, cek apakah website memerlukan login, atau tambah delay di `time.sleep()`.
 
 ### PyQt5 tidak terinstall
 ```
 ModuleNotFoundError: No module named 'PyQt5'
 ```
-**Solusi:**
-```bash
-pip install PyQt5
-```
-
-### File log tidak terbuat
-Folder `logs/` akan dibuat otomatis saat pertama kali menjalankan aplikasi. Jika tidak terbuat, pastikan kamu punya permission menulis di folder project.
+**Solusi:** `pip install PyQt5`
 
 ---
 
-## 📊 Alur Kerja Aplikasi
+## Alur Kerja Aplikasi
 
 ```
 User input URL
@@ -252,7 +240,7 @@ ScraperWorker.start() — berjalan di background thread
       ↓
 setup_driver() — inisialisasi Chrome headless
       ↓
-get_article_links() — kumpulkan semua URL artikel
+get_article_links() — kumpulkan semua URL artikel (max 3 halaman pagination)
       ↓
 Loop setiap URL:
   scrape_article() — ekstraksi judul/tanggal/isi
@@ -266,32 +254,7 @@ User klik Export → simpan ke CSV/Excel
 
 ---
 
-## 🤝 Kontribusi (Untuk Anggota Tim)
-
-### Workflow Git
-
-```bash
-# Sebelum mulai coding
-git pull origin main
-
-# Setelah selesai 1 fitur
-git add .
-git commit -m "feat: deskripsi singkat"
-git push origin [nama-branch-kamu]
-```
-
-### Format Pesan Commit
-
-| Prefix | Dipakai untuk |
-|---|---|
-| `feat:` | Menambah fitur baru |
-| `fix:` | Memperbaiki bug |
-| `style:` | Perubahan tampilan |
-| `docs:` | Perubahan dokumentasi |
-| `test:` | Menambah testing |
-| `refactor:` | Perbaiki kode tanpa ubah fungsi |
-
-### Branch per Anggota
+## Kontribusi (Untuk Anggota Tim)
 
 | Branch | Penanggung Jawab |
 |---|---|
@@ -303,8 +266,10 @@ git push origin [nama-branch-kamu]
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 
-Project ini dibuat untuk keperluan Tugas Praktikum Pemrograman Berbasis Objek.
+Project ini dibuat untuk keperluan Tugas Proyek 1 Pengembangan Perangkat Lunak.
 
 ---
+
+*Kelompok A1 D4_1A Teknik Informatika*
