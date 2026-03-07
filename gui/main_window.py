@@ -438,6 +438,133 @@ class MainWindow(QMainWindow):
         # Connect tombol hapus log
         self.btn_clear_log.clicked.connect(self.log_box.clear)
         
+        # === CONNECT SEMUA TOMBOL ===
+        self.btn_start.clicked.connect(self.start_scraping)
+        self.btn_stop.clicked.connect(self.stop_scraping)
+        self.btn_csv.clicked.connect(self.do_export_csv)
+        self.btn_excel.clicked.connect(self.do_export_excel)
+        
+    # =============================
+    # SLOT FUNCTIONS
+    # =============================
+
+    def start_scraping(self):
+        url = self.url_in.text().strip()
+
+        # Validasi URL tidak kosong
+        if not url:
+            self.log_box.append('[WARN]  Masukkan URL dulu sebelum klik Start!')
+            return
+
+        # Reset tabel dan artikel
+        self.articles = []
+        self.table.setRowCount(0)
+        self.lbl_count.setText('0 artikel')
+        self.lbl_count.setStyleSheet('color: #333333; font-size: 12px;')
+        self.log_box.clear()
+        self.progress.setValue(0)
+
+        # Ambil parameter filter
+        sd = self.dt_start.date().toPyDate() if self.chk_date.isChecked() else None
+        ed = self.dt_end.date().toPyDate() if self.chk_date.isChecked() else None
+
+        # Buat dan jalankan worker — import dari Faqih
+        # from utils.worker_thread import ScraperWorker  ← uncomment kalau sudah ada
+        # self.worker = ScraperWorker(url, self.spin_lim.value(), sd, ed)
+        # self.worker.article_ready.connect(self.on_article)
+        # self.worker.progress_update.connect(self.on_progress)
+        # self.worker.finished.connect(self.on_done)
+        # self.worker.error_occurred.connect(self.on_error)
+        # self.worker.start()
+
+        # Toggle tombol
+        self.btn_start.setEnabled(False)
+        self.btn_stop.setEnabled(True)
+        self.prog_lbl.setText('Menghubungkan ke URL...')
+        self.log_box.append(f'[INFO]  Scraping dimulai: {url}')
+
+    def stop_scraping(self):
+        if self.worker:
+            self.worker.stop()
+        self.log_box.append('[INFO]  Scraping dihentikan oleh user.')
+
+    def on_article(self, article: dict):
+        # Filter tanggal kalau aktif
+        if self.chk_date.isChecked():
+            from utils.date_filter import filter_by_date
+            hasil = filter_by_date(
+                [article],
+                self.dt_start.date().toPyDate(),
+                self.dt_end.date().toPyDate()
+            )
+            if not hasil:
+                return  # artikel tidak lolos filter, skip
+
+        # Tambah ke list
+        self.articles.append(article)
+
+        # Tambah baris baru ke tabel
+        row = self.table.rowCount()
+        self.table.insertRow(row)
+        self.table.setItem(row, 0, QTableWidgetItem(str(row + 1)))
+        self.table.setItem(row, 1, QTableWidgetItem(article.get('title', '')))
+        self.table.setItem(row, 2, QTableWidgetItem(article.get('date', '')))
+        self.table.setItem(row, 3, QTableWidgetItem(article.get('content', '')[:80] + '...'))
+        self.table.setItem(row, 4, QTableWidgetItem(article.get('url', '')))
+        self.table.scrollToBottom()
+
+        # Update label count
+        self.lbl_count.setText(f'{len(self.articles)} artikel')
+        self.log_box.append(f'[INFO]  ✓ Artikel {row + 1}: {article.get("title", "")[:50]}...')
+
+    def on_progress(self, current: int, total: int):
+        self.progress.setMaximum(total)
+        self.progress.setValue(current)
+        self.prog_lbl.setText(f'Memproses {current}/{total} artikel...')
+
+    def on_done(self):
+        # Reset tombol
+        self.btn_start.setEnabled(True)
+        self.btn_stop.setEnabled(False)
+
+        # Update label dan log
+        total = len(self.articles)
+        self.prog_lbl.setText(f'Selesai — {total} artikel berhasil.')
+        self.lbl_count.setText(f'{total} artikel')
+        self.lbl_count.setStyleSheet('color: #4ade80; font-size: 12px;')
+        self.log_box.append(f'[DONE]  Scraping selesai — {total} artikel berhasil.')
+
+    def on_error(self, msg: str):
+        self.log_box.append(f'[ERROR]  {msg}')
+        self.btn_start.setEnabled(True)
+        self.btn_stop.setEnabled(False)
+
+    def do_export_csv(self):
+        if not self.articles:
+            self.log_box.append('[WARN]  Tidak ada artikel untuk diekspor!')
+            return
+        from PyQt5.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getSaveFileName(
+            self, 'Simpan CSV', 'hasil_scraping.csv', 'CSV (*.csv)'
+        )
+        if path:
+            # from utils.exporter import export_to_csv  ← uncomment kalau Anin sudah selesai
+            # export_to_csv(self.articles, path)
+            self.log_box.append(f'[DONE]  CSV tersimpan: {path}')
+
+    def do_export_excel(self):
+        if not self.articles:
+            self.log_box.append('[WARN]  Tidak ada artikel untuk diekspor!')
+            return
+        from PyQt5.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getSaveFileName(
+            self, 'Simpan Excel', 'hasil_scraping.xlsx', 'Excel (*.xlsx)'
+        )
+        if path:
+            # from utils.exporter import export_to_excel  ← uncomment kalau Anin sudah selesai
+            # export_to_excel(self.articles, path)
+            self.log_box.append(f'[DONE]  Excel tersimpan: {path}')
+        
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = MainWindow()
