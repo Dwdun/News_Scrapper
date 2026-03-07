@@ -4,7 +4,8 @@ from PyQt5.QtWidgets import (
     QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
     QProgressBar, QSpinBox, QDateEdit, QCheckBox, QTextEdit, QFileDialog, QApplication
 )
-from PyQt5.QtCore import QDate, Qt
+from PyQt5.QtCore import QDate, Qt, QUrl
+from PyQt5.QtGui import QDesktopServices
 from utils.worker_thread import ScraperWorker
 from utils.date_filter import filter_by_date
 from utils.exporter import export_to_csv, export_to_excel
@@ -446,10 +447,17 @@ class MainWindow(QMainWindow):
         self.btn_stop.clicked.connect(self.stop_scraping)
         self.btn_csv.clicked.connect(self.do_export_csv)
         self.btn_excel.clicked.connect(self.do_export_excel)
+        self.table.cellClicked.connect(self.on_cell_clicked)
         
     # =============================
     # SLOT FUNCTIONS
     # =============================
+
+    def on_cell_clicked(self, row, col):
+        if col == 4:  # Kolom URL
+            item = self.table.item(row, col)
+            if item and item.text():
+                QDesktopServices.openUrl(QUrl(item.text()))
 
     def start_scraping(self):
         url = self.url_in.text().strip()
@@ -476,6 +484,7 @@ class MainWindow(QMainWindow):
         self.worker.progress_update.connect(self.on_progress)
         self.worker.finished.connect(self.on_done)
         self.worker.error_occurred.connect(self.on_error)
+        self.worker.log_message.connect(self.log_box.append)
         self.worker.start()
 
         # Toggle tombol
@@ -487,6 +496,9 @@ class MainWindow(QMainWindow):
     def stop_scraping(self):
         if self.worker:
             self.worker.stop()
+        self.btn_start.setEnabled(True)
+        self.btn_stop.setEnabled(False)
+        self.prog_lbl.setText('Scraping dihentikan.')
         self.log_box.append('[INFO]  Scraping dihentikan oleh user.')
 
     def on_article(self, article: dict):
@@ -509,7 +521,7 @@ class MainWindow(QMainWindow):
         self.table.setItem(row, 0, QTableWidgetItem(str(row + 1)))
         self.table.setItem(row, 1, QTableWidgetItem(article.get('title', '')))
         self.table.setItem(row, 2, QTableWidgetItem(article.get('date', '')))
-        self.table.setItem(row, 3, QTableWidgetItem(article.get('content', '')[:80] + '...'))
+        self.table.setItem(row, 3, QTableWidgetItem((article.get('content') or '')[:80] + '...'))
         self.table.setItem(row, 4, QTableWidgetItem(article.get('url', '')))
         self.table.scrollToBottom()
 

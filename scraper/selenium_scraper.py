@@ -8,7 +8,7 @@ from dateutil import parser as dateparser
 import json
 import os
 import time
-from article_extractor import extract_article_with_fallback
+from scraper.article_extractor import extract_article_with_fallback
 
 
 def parse_date(date_str):
