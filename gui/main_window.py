@@ -100,14 +100,21 @@ class MainWindow(QMainWindow):
         lay = QVBoxLayout(root)
         lay.setSpacing(6)
         lay.setContentsMargins(20, 20, 20, 20)
-        
-        # === Bar Input URL ===
-        r1 = QHBoxLayout()  
 
+        # =============================================
+        # INPUT PANEL — selalu tampil, posisi di tengah
+        # =============================================
+        self.input_panel = QWidget()
+        input_lay = QVBoxLayout(self.input_panel)
+        input_lay.setSpacing(10)
+        input_lay.setContentsMargins(0, 0, 0, 0)
+
+        # === Bar Input URL ===
+        r1 = QHBoxLayout()
         self.url_in = QLineEdit()
         self.url_in.setPlaceholderText('Masukkan URL halaman berita...')
-        self.url_in.setFixedHeight(48)       
-        self.url_in.setMaximumWidth(800)     
+        self.url_in.setFixedHeight(48)
+        self.url_in.setMaximumWidth(800)
         self.url_in.setStyleSheet("""
             QLineEdit {
                 background-color: #1a1a1a;
@@ -121,7 +128,7 @@ class MainWindow(QMainWindow):
         """)
 
         self.btn_start = QPushButton('▶  Start')
-        self.btn_start.setFixedHeight(48)    
+        self.btn_start.setFixedHeight(48)
         self.btn_start.setFixedWidth(120)
         self.btn_start.setStyleSheet("""
             QPushButton {
@@ -138,7 +145,7 @@ class MainWindow(QMainWindow):
         """)
 
         self.btn_stop = QPushButton('■  Stop')
-        self.btn_stop.setFixedHeight(48)     
+        self.btn_stop.setFixedHeight(48)
         self.btn_stop.setFixedWidth(120)
         self.btn_stop.setEnabled(False)
         self.btn_stop.setStyleSheet("""
@@ -157,47 +164,39 @@ class MainWindow(QMainWindow):
 
         url_label = QLabel('URL :')
         url_label.setStyleSheet("color: #888888; font-size: 18px;")
-
-        r1.addStretch()                          
+        r1.addStretch()
         r1.addWidget(url_label)
         r1.addWidget(self.url_in)
         r1.addWidget(self.btn_start)
         r1.addWidget(self.btn_stop)
-        r1.addStretch()                        
-        lay.addLayout(r1)
-        
+        r1.addStretch()
+        input_lay.addLayout(r1)
+
         # === Filter dan Limit ===
         r2 = QHBoxLayout()
         r2.setSpacing(10)
 
         self.chk_date = QCheckBox('Filter Tanggal')
         self.chk_date.setStyleSheet("""
-            QCheckBox {
-                color: #888888;
-                font-size: 13px;
-            }
+            QCheckBox { color: #888888; font-size: 13px; }
             QCheckBox:checked { color: #e8e8e8; }
             QCheckBox::indicator {
-                width: 16px;
-                height: 16px;
-                border: 1px solid #2a2a2a;
-                border-radius: 4px;
+                width: 16px; height: 16px;
+                border: 1px solid #2a2a2a; border-radius: 4px;
                 background-color: #1a1a1a;
             }
-            QCheckBox::indicator:checked {
-                background-color: #e8e8e8;
-            }
+            QCheckBox::indicator:checked { background-color: #e8e8e8; }
         """)
 
         self.dt_start = QDateEdit(QDate.currentDate())
         self.dt_start.setCalendarPopup(True)
         self.dt_start.setFixedHeight(44)
-        self.dt_start.setEnabled(False)  # nonaktif dulu sebelum checkbox dicentang
+        self.dt_start.setEnabled(False)
 
         self.dt_end = QDateEdit(QDate.currentDate())
         self.dt_end.setCalendarPopup(True)
         self.dt_end.setFixedHeight(44)
-        self.dt_end.setEnabled(False)  # nonaktif dulu sebelum checkbox dicentang
+        self.dt_end.setEnabled(False)
 
         self.spin_lim = QSpinBox()
         self.spin_lim.setMinimum(0)
@@ -208,53 +207,38 @@ class MainWindow(QMainWindow):
         self.spin_lim.setFixedHeight(44)
         self.spin_lim.setStyleSheet("""
             QSpinBox {
-                background-color: #1a1a1a;
-                border: 1px solid #2a2a2a;
-                border-radius: 6px;
-                padding: 6px 10px;
-                color: #e8e8e8;
-                font-size: 13px;
+                background-color: #1a1a1a; border: 1px solid #2a2a2a;
+                border-radius: 6px; padding: 6px 10px;
+                color: #e8e8e8; font-size: 13px;
             }
         """)
 
-        # === SpinBox untuk jumlah karakter preview isi berita ===
         self.spin_preview = QSpinBox()
         self.spin_preview.setMinimum(10)
         self.spin_preview.setMaximum(9999)
-        self.spin_preview.setValue(80)  # Default 80 karakter
+        self.spin_preview.setValue(80)
         self.spin_preview.setPrefix('Preview : ')
         self.spin_preview.setSuffix(' char')
         self.spin_preview.setFixedHeight(44)
         self.spin_preview.setStyleSheet("""
             QSpinBox {
-                background-color: #1a1a1a;
-                border: 1px solid #2a2a2a;
-                border-radius: 6px;
-                padding: 6px 10px;
-                color: #e8e8e8;
-                font-size: 13px;
+                background-color: #1a1a1a; border: 1px solid #2a2a2a;
+                border-radius: 6px; padding: 6px 10px;
+                color: #e8e8e8; font-size: 13px;
             }
         """)
 
-        # === Checkbox untuk toggle headless mode ===
         self.chk_headless = QCheckBox('Headless Mode')
-        self.chk_headless.setChecked(True)  # Default: headless aktif
+        self.chk_headless.setChecked(True)
         self.chk_headless.setStyleSheet("""
-            QCheckBox {
-                color: #888888;
-                font-size: 13px;
-            }
+            QCheckBox { color: #888888; font-size: 13px; }
             QCheckBox:checked { color: #e8e8e8; }
             QCheckBox::indicator {
-                width: 16px;
-                height: 16px;
-                border: 1px solid #2a2a2a;
-                border-radius: 4px;
+                width: 16px; height: 16px;
+                border: 1px solid #2a2a2a; border-radius: 4px;
                 background-color: #1a1a1a;
             }
-            QCheckBox::indicator:checked {
-                background-color: #e8e8e8;
-            }
+            QCheckBox::indicator:checked { background-color: #e8e8e8; }
         """)
 
         lbl_dari = QLabel('Dari :')
@@ -276,196 +260,119 @@ class MainWindow(QMainWindow):
         r2.addSpacing(10)
         r2.addWidget(self.chk_headless)
         r2.addStretch()
-        lay.addLayout(r2)
+        input_lay.addLayout(r2)
 
-        # Checkbox mengaktifkan/nonaktifkan DateEdit
         self.chk_date.toggled.connect(self.dt_start.setEnabled)
         self.chk_date.toggled.connect(self.dt_end.setEnabled)
 
-        # === PROGRESS BAR & LABEL STATUS ===
+        # Tambah input_panel ke tengah dengan stretch atas & bawah
+        lay.addStretch(1)               # ← spacer atas
+        lay.addWidget(self.input_panel)
+        lay.addStretch(1)               # ← spacer bawah
+
+        # =============================================
+        # RESULTS PANEL — tersembunyi sampai Start diklik
+        # =============================================
+        self.results_panel = QWidget()
+        results_lay = QVBoxLayout(self.results_panel)
+        results_lay.setSpacing(6)
+        results_lay.setContentsMargins(0, 8, 0, 0)
+
+        # Progress
         r3 = QVBoxLayout()
         r3.setSpacing(4)
-
         self.prog_lbl = QLabel('Siap — Masukkan URL dan klik Start.')
-        self.prog_lbl.setStyleSheet("""
-            color: #555555;
-            font-size: 12px;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-        """)
-
+        self.prog_lbl.setStyleSheet("color: #555555; font-size: 12px;")
         self.progress = QProgressBar()
         self.progress.setValue(0)
         self.progress.setFixedHeight(6)
         self.progress.setTextVisible(False)
         self.progress.setStyleSheet("""
-            QProgressBar {
-                background-color: #1a1a1a;
-                border: none;
-                border-radius: 3px;
-            }
-            QProgressBar::chunk {
-                background-color: #e8e8e8;
-                border-radius: 3px;
-            }
+            QProgressBar { background-color: #1a1a1a; border: none; border-radius: 3px; }
+            QProgressBar::chunk { background-color: #e8e8e8; border-radius: 3px; }
         """)
-
         r3.addWidget(self.prog_lbl)
         r3.addWidget(self.progress)
-        lay.addLayout(r3)
-        
-        # === TABEL 5 KOLOM ===
+        results_lay.addLayout(r3)
+
+        # Tabel
         self.table = QTableWidget(0, 5)
-        self.table.setHorizontalHeaderLabels([
-            'No', 'Judul', 'Tanggal', 'Isi (preview)', 'URL'
-        ])
-
-        # Lebar kolom
-        self.table.setColumnWidth(0, 50)   # No
-        self.table.setColumnWidth(1, 280)  # Judul
-        self.table.setColumnWidth(2, 110)  # Tanggal
-        self.table.setColumnWidth(3, 350)  # Isi preview
-        self.table.horizontalHeader().setStretchLastSection(True)  # URL isi sisa
-
-        # Tinggi baris
+        self.table.setHorizontalHeaderLabels(['No','Judul','Tanggal','Isi (preview)','URL'])
+        self.table.setColumnWidth(0, 50)
+        self.table.setColumnWidth(1, 280)
+        self.table.setColumnWidth(2, 110)
+        self.table.setColumnWidth(3, 350)
+        self.table.horizontalHeader().setStretchLastSection(True)
         self.table.verticalHeader().setDefaultSectionSize(40)
-        self.table.verticalHeader().setVisible(False)  # sembunyikan nomor baris kiri
-
-        # Behaviour
-        self.table.setEditTriggers(QTableWidget.NoEditTriggers)  # tidak bisa diedit
-        self.table.setSelectionBehavior(QTableWidget.SelectRows)  # pilih per baris
-        self.table.setAlternatingRowColors(True)  # warna selang-seling
-        self.table.setShowGrid(False)  # sembunyikan garis grid
-
+        self.table.verticalHeader().setVisible(False)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        self.table.setAlternatingRowColors(True)
+        self.table.setShowGrid(False)
         self.table.setStyleSheet("""
             QTableWidget {
-                background-color: #0f0f0f;
-                border: 1px solid #1e1e1e;
-                border-radius: 8px;
-                font-family: 'Inter', 'Segoe UI', sans-serif;
-                font-size: 13px;
-                outline: none;
+                background-color: #0f0f0f; border: 1px solid #1e1e1e;
+                border-radius: 8px; font-size: 13px; outline: none;
             }
-            QTableWidget::item {
-                padding: 8px 12px;
-                color: #e8e8e8;
-                border-bottom: 1px solid #1a1a1a;
-            }
-            QTableWidget::item:selected {
-                background-color: #1e1e1e;
-                color: #ffffff;
-            }
-            QTableWidget::item:alternate {
-                background-color: #0a0a0a;
-            }
+            QTableWidget::item { padding: 8px 12px; color: #e8e8e8; border-bottom: 1px solid #1a1a1a; }
+            QTableWidget::item:selected { background-color: #1e1e1e; color: #ffffff; }
+            QTableWidget::item:alternate { background-color: #0a0a0a; }
             QHeaderView::section {
-                background-color: #0f0f0f;
-                color: #444444;
-                padding: 10px 12px;
-                border: none;
-                border-bottom: 1px solid #1e1e1e;
-                font-weight: 600;
-                font-size: 11px;
-                font-family: 'Inter', 'Segoe UI', sans-serif;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
+                background-color: #0f0f0f; color: #444444;
+                padding: 10px 12px; border: none; border-bottom: 1px solid #1e1e1e;
+                font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
             }
         """)
+        results_lay.addWidget(self.table, stretch=1)
 
-        lay.addWidget(self.table, stretch=1)
-        
-        # === TOMBOL EXPORT ===
+        # Export row
         r4 = QHBoxLayout()
         r4.setSpacing(8)
-
+        self.lbl_count = QLabel('0 artikel')
+        self.lbl_count.setStyleSheet("color: #333333; font-size: 12px;")
         self.btn_csv = QPushButton('⬇  Export CSV')
         self.btn_csv.setFixedHeight(40)
         self.btn_csv.setStyleSheet("""
             QPushButton {
-                background-color: #1a1a1a;
-                color: #888888;
-                border: 1px solid #2a2a2a;
-                border-radius: 6px;
-                padding: 8px 18px;
-                font-family: 'Inter', 'Segoe UI', sans-serif;
-                font-size: 13px;
-                font-weight: 500;
+                background-color: #1a1a1a; color: #888888;
+                border: 1px solid #2a2a2a; border-radius: 6px; font-size: 13px; font-weight: 500;
             }
-            QPushButton:hover {
-                border-color: #e8e8e8;
-                color: #e8e8e8;
-            }
+            QPushButton:hover { border-color: #e8e8e8; color: #e8e8e8; }
             QPushButton:disabled { color: #2a2a2a; border-color: #1e1e1e; }
         """)
-
         self.btn_excel = QPushButton('⬇  Export Excel')
         self.btn_excel.setFixedHeight(40)
         self.btn_excel.setStyleSheet("""
             QPushButton {
-                background-color: #1a1a1a;
-                color: #888888;
-                border: 1px solid #2a2a2a;
-                border-radius: 6px;
-                padding: 8px 18px;
-                font-family: 'Inter', 'Segoe UI', sans-serif;
-                font-size: 13px;
-                font-weight: 500;
+                background-color: #1a1a1a; color: #888888;
+                border: 1px solid #2a2a2a; border-radius: 6px; font-size: 13px; font-weight: 500;
             }
-            QPushButton:hover {
-                border-color: #4ade80;
-                color: #4ade80;
-            }
+            QPushButton:hover { border-color: #4ade80; color: #4ade80; }
             QPushButton:disabled { color: #2a2a2a; border-color: #1e1e1e; }
         """)
-
-        # Label jumlah artikel
-        self.lbl_count = QLabel('0 artikel')
-        self.lbl_count.setStyleSheet("""
-            color: #333333;
-            font-size: 12px;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-        """)
-
-        r4.addWidget(self.lbl_count)       # kiri — jumlah artikel
-        r4.addStretch()                    # dorong tombol ke kanan
+        r4.addWidget(self.lbl_count)
+        r4.addStretch()
         r4.addWidget(self.btn_csv)
         r4.addWidget(self.btn_excel)
-        lay.addLayout(r4)
-        
-        # === PANEL LOG ===
-        # Header log
+        results_lay.addLayout(r4)
+
+        # Log header
         r5 = QHBoxLayout()
-
         lbl_log = QLabel('LOG')
-        lbl_log.setStyleSheet("""
-            color: #333333;
-            font-size: 10px;
-            font-weight: 700;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            letter-spacing: 1px;
-        """)
-
+        lbl_log.setStyleSheet("color: #333333; font-size: 10px; font-weight: 700; letter-spacing: 1px;")
         self.btn_clear_log = QPushButton('Hapus Log')
         self.btn_clear_log.setFixedHeight(24)
         self.btn_clear_log.setStyleSheet("""
             QPushButton {
-                background-color: transparent;
-                color: #2a2a2a;
-                border: 1px solid #1e1e1e;
-                border-radius: 4px;
-                padding: 0px 10px;
-                font-family: 'Inter', 'Segoe UI', sans-serif;
-                font-size: 10px;
+                background-color: transparent; color: #2a2a2a;
+                border: 1px solid #1e1e1e; border-radius: 4px; font-size: 10px; padding: 0 10px;
             }
-            QPushButton:hover {
-                color: #555555;
-                border-color: #333333;
-            }
+            QPushButton:hover { color: #555555; border-color: #333333; }
         """)
-
         r5.addWidget(lbl_log)
         r5.addStretch()
         r5.addWidget(self.btn_clear_log)
-        lay.addLayout(r5)
+        results_lay.addLayout(r5)
 
         # Log box
         self.log_box = QTextEdit()
@@ -473,28 +380,25 @@ class MainWindow(QMainWindow):
         self.log_box.setFixedHeight(120)
         self.log_box.setStyleSheet("""
             QTextEdit {
-                background-color: #0a0a0a;
-                border: 1px solid #1a1a1a;
-                border-radius: 8px;
-                color: #4ade80;
-                font-family: 'Consolas', 'Courier New', monospace;
-                font-size: 11px;
-                padding: 8px;
+                background-color: #0a0a0a; border: 1px solid #1a1a1a;
+                border-radius: 8px; color: #4ade80;
+                font-family: 'Consolas', monospace; font-size: 11px; padding: 8px;
             }
         """)
+        results_lay.addWidget(self.log_box)
 
-        lay.addWidget(self.log_box)
+        # Tambahkan results_panel — tersembunyi dulu
+        lay.addWidget(self.results_panel)
+        self.results_panel.hide()
 
-        # Connect tombol hapus log
-        self.btn_clear_log.clicked.connect(self.log_box.clear)
-        
         # === CONNECT SEMUA TOMBOL ===
+        self.btn_clear_log.clicked.connect(self.log_box.clear)
         self.btn_start.clicked.connect(self.start_scraping)
         self.btn_stop.clicked.connect(self.stop_scraping)
         self.btn_csv.clicked.connect(self.do_export_csv)
         self.btn_excel.clicked.connect(self.do_export_excel)
         self.table.cellClicked.connect(self.on_cell_clicked)
-        
+                
     # =============================
     # SLOT FUNCTIONS
     # =============================
@@ -508,12 +412,17 @@ class MainWindow(QMainWindow):
     def start_scraping(self):
         url = self.url_in.text().strip()
 
-        # Validasi URL tidak kosong
         if not url:
-            self.log_box.append('[WARN]  Masukkan URL dulu sebelum klik Start!')
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.warning(self, 'URL Kosong', 'Masukkan URL dulu sebelum klik Start!')
             return
 
-        # Reset tabel dan artikel
+        # Tampilkan results panel + hapus stretch tengah saat pertama kali
+        if not self.results_panel.isVisible():
+            self.results_panel.show()
+            self.resize(1200, 800)
+
+        # Reset
         self.articles = []
         self.table.setRowCount(0)
         self.lbl_count.setText('0 artikel')
@@ -521,25 +430,29 @@ class MainWindow(QMainWindow):
         self.log_box.clear()
         self.progress.setValue(0)
 
-        # Ambil parameter filter
+        # Parameter filter
         sd = self.dt_start.date().toPyDate() if self.chk_date.isChecked() else None
         ed = self.dt_end.date().toPyDate() if self.chk_date.isChecked() else None
-         
-        headless = self.chk_headless.isChecked()  # Ambil status headless mode
-        self.worker = ScraperWorker(url, self.spin_lim.value(), sd, ed, headless=headless)
-        self.worker.article_ready.connect(self.on_article)
-        self.worker.progress_update.connect(self.on_progress)
-        self.worker.finished.connect(self.on_done)
-        self.worker.error_occurred.connect(self.on_error)
-        self.worker.log_message.connect(self.log_box.append)
-        self.worker.start()
+        headless = self.chk_headless.isChecked()
 
-        # Toggle tombol
+        try:
+            from utils.worker_thread import ScraperWorker
+            self.worker = ScraperWorker(url, self.spin_lim.value(), sd, ed, headless=headless)
+            self.worker.article_ready.connect(self.on_article)
+            self.worker.progress_update.connect(self.on_progress)
+            self.worker.finished.connect(self.on_done)
+            self.worker.error_occurred.connect(self.on_error)
+            self.worker.log_message.connect(self.log_box.append)
+            self.worker.start()
+        except ImportError:
+            self.log_box.append('[ERROR]  utils/worker_thread.py belum ada — hubungi Faqih!')
+            return
+
         self.btn_start.setEnabled(False)
         self.btn_stop.setEnabled(True)
         self.prog_lbl.setText('Menghubungkan ke URL...')
         self.log_box.append(f'[INFO]  Scraping dimulai: {url}')
-
+        
     def stop_scraping(self):
         if self.worker:
             self.worker.stop()
