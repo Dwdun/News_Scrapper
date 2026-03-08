@@ -445,7 +445,7 @@ class MainWindow(QMainWindow):
             self.worker.log_message.connect(self.log_box.append)
             self.worker.start()
         except ImportError:
-            self.log_box.append('[ERROR]  utils/worker_thread.py belum ada — hubungi Faqih!')
+            self.log_box.append('[ERROR]  utils/worker_thread.py tidak ditemukan atau gagal diimpor!')
             return
 
         self.btn_start.setEnabled(False)
